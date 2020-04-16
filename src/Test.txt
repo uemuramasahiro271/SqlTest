@@ -1,0 +1,4 @@
+Create Table if not exists testdb.sqlTest(ID int not null primary key, Name varchar(50));
+insert into testdb.sqlTest values(1, "aa");
+insert into testdb.sqlTest values(2, "bb");
+SELECT * FROM testdb.sqlTest;
