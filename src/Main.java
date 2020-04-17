@@ -4,9 +4,9 @@ public class Main {
 
 		var sqliteTest = new SqliteTest();
 		try {
-			sqliteTest.execute();
+			//sqliteTest.execute();
+			sqliteTest.transactionSample();
 		} catch (Exception e) {
-			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
 	}
