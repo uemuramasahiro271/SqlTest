@@ -4,8 +4,8 @@ public class Main {
 
 		var sqliteTest = new SqliteTest();
 		try {
-			//sqliteTest.execute();
-			sqliteTest.transactionSample();
+			sqliteTest.execute();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
