@@ -2,13 +2,21 @@ public class Main {
 
 	public static void main(String[] args) {
 
-		var sqliteTest = new SqliteTest();
+		var mySqlTest = new MySqlTest();
 		try {
-			sqliteTest.execute();
+			mySqlTest.execute();
 
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+//		var sqliteTest = new SqliteTest();
+//		try {
+//			sqliteTest.execute();
+//
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 }
