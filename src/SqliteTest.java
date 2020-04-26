@@ -1,11 +1,82 @@
 import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sqlite.SQLiteConfig;
 
 public class SqliteTest {
 
-	public void execute() throws Exception {
+	private Connection connection;
+
+	public void connect(String dbName) throws SQLException {
+		// フォルダを作成する
+		var newdir = new File("database");
+		newdir.mkdir();
+
+        var config = new SQLiteConfig();
+        config.enforceForeignKeys(true);
+		// DBファイルに接続する (ファイルがなければ作成される)
+		connection = DriverManager.getConnection("jdbc:sqlite:database/" + dbName + ".db", config.toProperties());
+	}
+
+	public void disConnect() throws Exception {
+	      try {
+	          if ( connection != null ) connection.close();
+	        }
+	        catch(Exception e){
+	          System.out.println( "Exception! :" + e.toString() );
+	          throw new Exception();
+	        }
+	}
+
+	public void execute(String sql) throws SQLException {
+		try {
+			connection.setAutoCommit(false);
+
+			var stmt = connection.prepareStatement(sql);
+			stmt.executeUpdate();
+
+			connection.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			connection.rollback();
+			System.out.println("rollback");
+		}
+	}
+
+	public void execute(String[] sqlList) throws SQLException {
+		try {
+			connection.setAutoCommit(false);
+
+			for(var sql : sqlList) {
+				var stmt = connection.prepareStatement(sql);
+				stmt.executeUpdate();
+			}
+
+			connection.commit();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			connection.rollback();
+			System.out.println("rollback");
+		}
+	}
+
+	public void select(String sql) throws SQLException {
+
+		//結果を表示する
+		var stmt = connection.prepareStatement(sql);
+		var rs = stmt.executeQuery();
+		showResult(rs);
+	}
+
+	public void sample() throws Exception {
 
 		// フォルダを作成する
 		var newdir = new File("database");
@@ -62,11 +133,7 @@ public class SqliteTest {
 			//結果を表示する
 			stmt = conn.prepareStatement("select * from employee");
 			var rs = stmt.executeQuery();
-			while(rs.next()) {
-				System.out.println("id = " + rs.getInt("id"));
-				System.out.println("name = " + rs.getString("name"));
-				System.out.println("age = " + rs.getInt("age"));
-			}
+			showResult(rs);
 
 			// コミットする
 			conn.commit();
@@ -85,5 +152,35 @@ public class SqliteTest {
 	          throw new Exception();
 	        }
 		}
+	}
+
+	private void showResult(ResultSet rs) throws SQLException {
+
+		String columnString = "";
+		List<String> rowList = new ArrayList<String>();
+		boolean flag = false;
+
+		while(rs.next()) {
+			ResultSetMetaData rsmd = rs.getMetaData();
+
+			var rowStr = "";
+			for(int i = 1; i <= rsmd.getColumnCount(); i++) {
+				var columnName = rsmd.getColumnLabel(i);
+				if(!flag) {
+					columnString += columnName + ", ";
+				}
+				rowStr += rs.getString(columnName) + ", ";
+			}
+			flag = true;
+			rowList.add(rowStr);
+		}
+
+		System.out.println("----------------------------------------------");
+		System.out.println(columnString);
+		for(var rowStr : rowList) {
+			System.out.println(rowStr);
+		}
+		System.out.println("----------------------------------------------");
+
 	}
 }
